@@ -15,12 +15,12 @@ const agent = new https.Agent({
     passphrase: ''
 });
 
-// converte as credenciais em ums string na base64
-const credentials = Buffer.from(
-    `${process.env.client_id}:${process.env.client_secret}`
-).toString('base64');
+const authenticate = ({clientID, clientSecret}) => {
+    // converte as credenciais em ums string na base64
+    const credentials = Buffer.from(
+        `${clientID}:${clientSecret}`
+    ).toString('base64');
 
-const authenticate = () => {
     // realiza a autenticação e gera um cobrança pix
     return axios({
         method: 'POST',
@@ -36,8 +36,8 @@ const authenticate = () => {
     });
 };
 
-const GNRequest = async () => {
-    const authResponse = await authenticate();
+const GNRequest = async (credentials) => {
+    const authResponse = await authenticate(credentials);
     const accessToken = authResponse.data?.access_token;
 
     return axios.create({
