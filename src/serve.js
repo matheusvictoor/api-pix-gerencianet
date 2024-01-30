@@ -23,7 +23,7 @@ const credentials = Buffer.from(
     `${process.env.client_id}:${process.env.client_secret}`
 ).toString('base64');
 
-// requisão https do tipo POST 
+// raliza a autenticação e gera um cobrança pix
 axios({
     method: 'POST',
     url: `${process.env.rota_base}/oauth/token`,
@@ -35,4 +35,29 @@ axios({
     data: {
         grant_type: 'client_credentials'
     }
-}).then((response) => console.log(response.data))
+}).then((response) => {
+    const accessToken = response.data?.access_token;
+
+    const endpoint = `${process.env.rota_base}/v2/cob`;
+
+    const dataCob = {
+        calendario: {
+            expiracao: 3600
+        },
+        valor: {
+            original: '100.00'
+        },
+        chave: '71cdf9ba-c695-4e3c-b010-abb521a3f1be',
+        solicitacaoPagador: 'Cobrança dos serviços prestados.'
+    }
+
+    const config = {
+        httpsAgent:agent,
+        headers:{
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    };
+
+    axios.post(endpoint, dataCob, config).then((response) => console.log(response.data))
+})
