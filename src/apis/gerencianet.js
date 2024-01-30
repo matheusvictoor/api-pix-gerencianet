@@ -2,7 +2,6 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const { builtinModules } = require('module');
 
 // busca o certificado
 const cert = fs.readFileSync(
@@ -24,7 +23,7 @@ const authenticate = ({clientID, clientSecret}) => {
     // realiza a autenticação e gera um cobrança pix
     return axios({
         method: 'POST',
-        url: `${process.env.rota_base}/oauth/token`,
+        url: `${process.env.ROTA_BASE}/oauth/token`,
         headers: {
             Authorization: `Basic ${credentials}`,
             'Content-Type': 'application/json'
@@ -41,7 +40,7 @@ const GNRequest = async (credentials) => {
     const accessToken = authResponse.data?.access_token;
 
     return axios.create({
-        baseURL: process.env.rota_base,
+        baseURL: process.env.ROTA_BASE,
         httpsAgent: agent,
         headers: {
             Authorization: `Bearer ${accessToken}`,
