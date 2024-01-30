@@ -3,9 +3,13 @@ if(process.env.node_env !== 'production'){
 }
 
 const express = require('express');
+const bodyParser = require('body-parser');
 const GNRequest = require('./apis/gerencianet');
 
 const app = express();
+
+app.use(bodyParser.json());
+
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
 
@@ -40,6 +44,10 @@ app.get('/cobrancas', async(req, res) => {
     res.send(cobResponse.data);
 })
 
+app.post('/webhook(/pix)?', (req, res) => {
+    console.log(req.body) // funciona direito apenas se tiver instalado o body-parser
+    res.send('200')
+})
 app.listen(8000, () => {
     console.log('running')
 })
