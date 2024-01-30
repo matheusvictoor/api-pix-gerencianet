@@ -1,0 +1,23 @@
+{
+  "name": "api-pix",
+  "version": "1.0.0",
+  "description": "Integração API Pix Gerencianet",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "nodemon src/serve.js"
+  },
+  "keywords": [
+    "API",
+    "Pix",
+    "Gerencianet"
+  ],
+  "author": "Matheus Victor",
+  "license": "MIT",
+  "devDependencies": {
+    "dotenv": "^16.4.1",
+    "nodemon": "^3.0.3"
+  },
+  "dependencies": {
+    "axios": "^1.6.7"
+  }
+}
