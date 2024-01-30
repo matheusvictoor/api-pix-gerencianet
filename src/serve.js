@@ -30,9 +30,9 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     // raliza a autenticação e gera um cobrança pix
-    axios({
+    const authResponse = await axios({
         method: 'POST',
         url: `${process.env.rota_base}/oauth/token`,
         headers: {
@@ -43,31 +43,32 @@ app.get('/', (req, res) => {
         data: {
             grant_type: 'client_credentials'
         }
-    }).then((response) => {
-        const accessToken = response.data?.access_token;
+    });
 
-        const reqDefault = axios.create({
-            baseURL: process.env.rota_base,
-            httpsAgent: agent,
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
-        })
+    const accessToken = authResponse.data?.access_token;
 
-        const dataCob = {
-            calendario: {
-                expiracao: 3600
-            },
-            valor: {
-                original: '100.00'
-            },
-            chave: '71cdf9ba-c695-4e3c-b010-abb521a3f1be',
-            solicitacaoPagador: 'Cobrança dos serviços prestados.'
+    const reqDefault = axios.create({
+        baseURL: process.env.rota_base,
+        httpsAgent: agent,
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
         }
-
-        reqDefault.post('/v2/cob', dataCob).then((response) => res.send(response.data))
     })
+
+    const dataCob = {
+        calendario: {
+            expiracao: 3600
+        },
+        valor: {
+            original: '100.00'
+        },
+        chave: '71cdf9ba-c695-4e3c-b010-abb521a3f1be',
+        solicitacaoPagador: 'Cobrança dos serviços prestados.'
+    }
+
+    const cobResponse = await reqDefault.post('/v2/cob', dataCob)
+    res.send(cobResponse.data);
 })
 
 app.listen(8000, () => {
