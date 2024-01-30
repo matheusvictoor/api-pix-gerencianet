@@ -67,8 +67,10 @@ app.get('/', async (req, res) => {
         solicitacaoPagador: 'Cobrança dos serviços prestados.'
     }
 
-    const cobResponse = await reqDefault.post('/v2/cob', dataCob)
-    res.send(cobResponse.data);
+    const cobResponse = await reqDefault.post('/v2/cob', dataCob);
+    const qrcodeResponse = await reqDefault.get(`/v2/loc/${cobResponse.data.loc.id}/qrcode`);
+
+    res.render('qrcode',{ qrcodeImage: qrcodeResponse.data.imagemQrcode });
 })
 
 app.listen(8000, () => {
