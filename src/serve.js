@@ -5,7 +5,8 @@ if(process.env.node_env !== 'production'){
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const https = require('https')
+const https = require('https');
+const { createECDH } = require('crypto');
 
 // busca o certificado
 const cert = fs.readFileSync(
@@ -38,7 +39,14 @@ axios({
 }).then((response) => {
     const accessToken = response.data?.access_token;
 
-    const endpoint = `${process.env.rota_base}/v2/cob`;
+    const reqDefault = axios.create({
+        baseURL: process.env.rota_base,
+        httpsAgent: agent,
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
 
     const dataCob = {
         calendario: {
@@ -51,13 +59,6 @@ axios({
         solicitacaoPagador: 'Cobrança dos serviços prestados.'
     }
 
-    const config = {
-        httpsAgent:agent,
-        headers:{
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        }
-    };
-
-    axios.post(endpoint, dataCob, config).then((response) => console.log(response.data))
+    reqDefault.post('/v2/cob', dataCob).then((response) => console.log(response.data))
 })
+
